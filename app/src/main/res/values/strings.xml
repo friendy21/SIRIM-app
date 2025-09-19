@@ -27,6 +27,9 @@
     <string name="message_export_failed">Export failed</string>
     <string name="message_camera_permission_required">Camera permission required</string>
     <string name="message_camera_unavailable">Unable to start camera</string>
+    <string name="message_capture_failed">Unable to capture image</string>
+    <string name="message_capture_saved">Image captured, saving record…</string>
+    <string name="message_capture_requires_result">Aim at a SIRIM form before capturing so OCR can populate the fields.</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
 </resources>

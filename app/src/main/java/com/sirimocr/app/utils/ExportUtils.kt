@@ -8,6 +8,8 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.util.Log
+
+import androidx.core.content.FileProvider
 import com.opencsv.CSVWriter
 import com.sirimocr.app.data.database.entities.SirimRecord
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,10 @@ class ExportUtils(private val context: Context) {
 
     suspend fun exportToCsv(records: List<SirimRecord>, name: String): Uri? = withContext(Dispatchers.IO) {
         runCatching {
-            val file = File(context.getExternalFilesDir(null), "$name.csv")
+            val file = File(context.getExternalFilesDir(null), "$name.csv").apply {
+                parentFile?.mkdirs()
+            }
+
             CSVWriter(FileWriter(file)).use { writer ->
                 writer.writeNext(arrayOf(
                     "SIRIM Serial",
@@ -54,7 +59,7 @@ class ExportUtils(private val context: Context) {
                     ))
                 }
             }
-            Uri.fromFile(file)
+            shareUri(file)
         }.onFailure { Log.e("ExportUtils", "CSV export failed", it) }.getOrNull()
     }
 
@@ -99,10 +104,12 @@ class ExportUtils(private val context: Context) {
                 row.createCell(9).setCellValue(record.validationStatus)
             }
             headers.indices.forEach { index -> sheet.autoSizeColumn(index) }
-            val file = File(context.getExternalFilesDir(null), "$name.xlsx")
+            val file = File(context.getExternalFilesDir(null), "$name.xlsx").apply {
+                parentFile?.mkdirs()
+            }
             FileOutputStream(file).use { output -> workbook.write(output) }
             workbook.close()
-            Uri.fromFile(file)
+            shareUri(file)
         }.onFailure { Log.e("ExportUtils", "Excel export failed", it) }.getOrNull()
     }
 
@@ -113,10 +120,12 @@ class ExportUtils(private val context: Context) {
             val page = document.startPage(pageInfo)
             drawPdfContent(page.canvas, records)
             document.finishPage(page)
-            val file = File(context.getExternalFilesDir(null), "$name.pdf")
+            val file = File(context.getExternalFilesDir(null), "$name.pdf").apply {
+                parentFile?.mkdirs()
+            }
             FileOutputStream(file).use { output -> document.writeTo(output) }
             document.close()
-            Uri.fromFile(file)
+            shareUri(file)
         }.onFailure { Log.e("ExportUtils", "PDF export failed", it) }.getOrNull()
     }
 
@@ -151,4 +160,8 @@ class ExportUtils(private val context: Context) {
             y += 12f
         }
     }
+
+    private fun shareUri(file: File): Uri =
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+
 }

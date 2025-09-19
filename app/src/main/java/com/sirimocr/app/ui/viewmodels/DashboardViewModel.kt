@@ -30,13 +30,17 @@ class DashboardViewModel(
         _ocrResult.value = result
     }
 
-    fun saveCurrentResult(imagePath: String? = null) {
-        val result = _ocrResult.value ?: return
-        val data = result.sirimData ?: return
-        val user = authService.currentUser() ?: return
+    fun saveCurrentResult(imagePath: String? = null): Boolean {
+        val result = _ocrResult.value ?: return false
+        val data = result.sirimData ?: return false
+        val user = authService.currentUser() ?: run {
+            _saveError.value = "Sign in to save records"
+            return false
+        }
         if (data.sirimSerialNo.isNullOrBlank()) {
             _saveError.value = "Serial number is required"
-            return
+            return false
+
         }
         val record = SirimRecord(
             id = UUID.randomUUID().toString(),
@@ -61,6 +65,7 @@ class DashboardViewModel(
                 _saveError.value = "Unable to save record"
             }
         }
+        return true
     }
 }
 

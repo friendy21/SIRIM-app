@@ -63,4 +63,13 @@
         app:layout_anchorGravity="bottom|center_horizontal"
         app:srcCompat="@android:drawable/ic_menu_camera" />
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/capture_progress"
+        style="@style/Widget.Material3.CircularProgressIndicator.ExtraSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="96dp"
+        android:visibility="gone" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

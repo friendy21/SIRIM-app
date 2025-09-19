@@ -1,35 +1,4 @@
 # SIRIM OCR Data Capture Application - Master Control Plan (MCP)
-
-> **Implementation Update (2024-02-26):** The repository now contains a fully bootstrapped native Android project that realises the architecture described below. Source code lives in the `app/` module and ships with CameraX + ML Kit OCR capture, Room persistence, Firebase sync scaffolding, encrypted preferences, and export utilities. Before opening the project in Android Studio, place your `google-services.json` file in `app/` and run `./gradlew assembleDebug` (or use the IDE) to verify the build.
-
-## Getting Started
-
-1. **Prerequisites**
-   - Android Studio Giraffe/Koala or newer with Android SDK 34
-   - JDK 17 (bundled with Android Studio)
-   - Firebase project configured for Authentication, Firestore, and Storage (free tier compatible)
-
-2. **Initial Setup**
-   - Clone this repository and open it in Android Studio.
-   - Add your `google-services.json` under `app/`.
-   - Sync Gradle; the wrapper targets Gradle 8.2 with AGP 8.2.2. If your clone is missing `gradle/wrapper/gradle-wrapper.jar`, run `gradle wrapper --gradle-version 8.2` once to regenerate it.
-   - (Optional) Update the applicationId in `app/build.gradle.kts` to your namespace.
-
-3. **Running the App**
-   - Use `Run > Run 'app'` from Android Studio to install on a device/emulator running Android 5.0 (API 21) or higher.
-   - The Dashboard screen requests camera permission, streams OCR results in real time, and allows saving snapshots to the local Room database.
-   - History shows locally stored captures and offers CSV/Excel/PDF exports. Settings exposes auto-sync and sign-out toggles.
-
-4. **Backend Configuration**
-   - Enable Email/Password authentication in Firebase Auth.
-   - Create the Firestore indexes (automatic) and Storage bucket paths (`users/{uid}/images/{recordId}.jpg`).
-   - Update Firestore/Storage security rules per the sections below.
-
-5. **Unit / Instrumentation Tests**
-   - Example unit tests are outlined in Section 11; run with `./gradlew test` or `./gradlew connectedAndroidTest` once a device/emulator is attached.
-
-The remainder of this MCP details the architecture, components, and roadmap that guided the implementation now present in the codebase.
-
 ## Executive Summary
 
 This Master Control Plan outlines the development of a native Android application for capturing SIRIM (Standards and Industrial Research Institute of Malaysia) certification data using real-time OCR technology with Firebase as the cloud backend solution. The application is designed with an offline-first architecture and synchronizes with Firebase services when connectivity is available.

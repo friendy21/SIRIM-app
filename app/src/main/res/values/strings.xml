@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">SIRIM OCR</string>
+    <string name="action_login">Sign In</string>
+    <string name="action_register">Register</string>
+    <string name="action_capture">Capture</string>
+    <string name="action_history">History</string>
+    <string name="action_settings">Settings</string>
+    <string name="permission_camera_rationale">Camera access is required to scan SIRIM certificates.</string>
+    <string name="permission_storage_rationale">Storage access is required to export captured data.</string>
+    <string name="label_confidence">Confidence</string>
+    <string name="label_records">Records</string>
+    <string name="label_validation_passed">Validation passed</string>
+    <string name="label_validation_failed">Validation failed</string>
+    <string name="label_syncing">Syncing…</string>
+    <string name="label_last_synced">Last synced: %1$s</string>
+    <string name="message_no_records">No records captured yet.</string>
+    <string name="message_offline_mode">Offline mode enabled. Data will sync when online.</string>
+    <string name="title_export_options">Export Options</string>
+    <string name="export_csv">Export CSV</string>
+    <string name="export_excel">Export Excel</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="action_enable_auto_sync">Enable automatic sync</string>
+    <string name="action_sign_out">Sign out</string>
+    <string name="title_export">Export</string>
+    <string name="message_no_records_export">No records to export</string>
+    <string name="message_export_success">Exported to %1$s</string>
+    <string name="message_export_failed">Export failed</string>
+    <string name="message_camera_permission_required">Camera permission required</string>
+    <string name="message_camera_unavailable">Unable to start camera</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+</resources>

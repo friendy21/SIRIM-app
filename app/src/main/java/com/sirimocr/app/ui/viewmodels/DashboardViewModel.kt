@@ -40,6 +40,7 @@ class DashboardViewModel(
         if (data.sirimSerialNo.isNullOrBlank()) {
             _saveError.value = "Serial number is required"
             return false
+
         }
         val record = SirimRecord(
             id = UUID.randomUUID().toString(),

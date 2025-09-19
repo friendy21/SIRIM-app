@@ -8,6 +8,7 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.util.Log
+
 import androidx.core.content.FileProvider
 import com.opencsv.CSVWriter
 import com.sirimocr.app.data.database.entities.SirimRecord
@@ -28,6 +29,7 @@ class ExportUtils(private val context: Context) {
             val file = File(context.getExternalFilesDir(null), "$name.csv").apply {
                 parentFile?.mkdirs()
             }
+
             CSVWriter(FileWriter(file)).use { writer ->
                 writer.writeNext(arrayOf(
                     "SIRIM Serial",
@@ -161,4 +163,5 @@ class ExportUtils(private val context: Context) {
 
     private fun shareUri(file: File): Uri =
         FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+
 }

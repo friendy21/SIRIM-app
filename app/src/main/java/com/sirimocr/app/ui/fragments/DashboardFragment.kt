@@ -1,7 +1,9 @@
 package com.sirimocr.app.ui.fragments
 
 import android.Manifest
+
 import android.content.Context
+
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,6 +33,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.sirimocr.app.ui.viewmodels.DashboardViewModel
+import com.sirimocr.app.ui.viewmodels.DashboardViewModelFactory
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -72,6 +79,7 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
         binding.captureButton.setOnClickListener { capturePhoto() }
+        binding.captureButton.setOnClickListener { viewModel.saveCurrentResult() }
         observeViewModel()
         ensureCameraPermission()
     }
@@ -125,6 +133,7 @@ class DashboardFragment : Fragment() {
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .setTargetRotation(binding.previewView.display?.rotation ?: 0)
             .build()
+
         try {
             cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(

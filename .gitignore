@@ -1,0 +1,11 @@
+# Android build outputs
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/app/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+# Gradle wrapper jar is intentionally absent; regenerate with `gradle wrapper` if needed

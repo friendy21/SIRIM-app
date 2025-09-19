@@ -1,5 +1,4 @@
 # SIRIM OCR Data Capture Application - Master Control Plan (MCP)
-
 ## Executive Summary
 
 This Master Control Plan outlines the development of a native Android application for capturing SIRIM (Standards and Industrial Research Institute of Malaysia) certification data using real-time OCR technology with Firebase as the cloud backend solution. The application is designed with an offline-first architecture and synchronizes with Firebase services when connectivity is available.

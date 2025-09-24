@@ -7,12 +7,13 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.sirimocr.app.data.model.SirimData
 import com.sirimocr.app.data.model.SirimOcrResult
+import java.io.Closeable
 import kotlinx.coroutines.tasks.await
 
 class MLKitOcrProcessor(
     private val validationEngine: ValidationEngine = ValidationEngine(),
     private val fieldExtractor: SirimFieldExtractor = SirimFieldExtractor()
-) {
+) : Closeable {
 
     private val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
@@ -59,5 +60,8 @@ class MLKitOcrProcessor(
         }
         val recognitionScore = if (count == 0) 0f else total / count
         return (recognitionScore * 0.7f + validationScore * 0.3f).coerceIn(0f, 1f)
+    }
+    override fun close() {
+        textRecognizer.close()
     }
 }

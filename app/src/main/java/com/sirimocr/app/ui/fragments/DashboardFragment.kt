@@ -1,20 +1,20 @@
 package com.sirimocr.app.ui.fragments
 
 import android.Manifest
-
 import android.content.Context
-
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.CameraUnavailableException
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -25,23 +25,23 @@ import com.sirimocr.app.R
 import com.sirimocr.app.SirimOcrApplication
 import com.sirimocr.app.databinding.FragmentDashboardBinding
 import com.sirimocr.app.ocr.MLKitOcrProcessor
-import com.sirimocr.app.utils.ImageUtils
 import com.sirimocr.app.ui.viewmodels.DashboardViewModel
 import com.sirimocr.app.ui.viewmodels.DashboardViewModelFactory
-import kotlinx.coroutines.Job
+import com.sirimocr.app.utils.ImageUtils
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.sirimocr.app.ui.viewmodels.DashboardViewModel
-import com.sirimocr.app.ui.viewmodels.DashboardViewModelFactory
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class DashboardFragment : Fragment() {
+
+    companion object {
+        private const val TAG = "DashboardFragment"
+    }
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
@@ -79,7 +79,6 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
         binding.captureButton.setOnClickListener { capturePhoto() }
-        binding.captureButton.setOnClickListener { viewModel.saveCurrentResult() }
         observeViewModel()
         ensureCameraPermission()
     }
@@ -87,6 +86,7 @@ class DashboardFragment : Fragment() {
     override fun onDestroyView() {
         analysisJob?.cancel()
         cameraExecutor?.shutdown()
+        ocrProcessor.close()
         imageCapture = null
         _binding = null
         super.onDestroyView()
@@ -105,8 +105,18 @@ class DashboardFragment : Fragment() {
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-            bindUseCases(cameraProvider)
+            try {
+                val cameraProvider = cameraProviderFuture.get()
+                bindUseCases(cameraProvider)
+            } catch (exception: ExecutionException) {
+                val cause = exception.cause
+                handleCameraError(if (cause is Exception) cause else exception)
+            } catch (exception: InterruptedException) {
+                Thread.currentThread().interrupt()
+                handleCameraError(exception)
+            } catch (exception: Exception) {
+                handleCameraError(exception)
+            }
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
@@ -143,12 +153,8 @@ class DashboardFragment : Fragment() {
                 imageCapture,
                 analysis
             )
-        } catch (t: Throwable) {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.message_camera_unavailable),
-                Toast.LENGTH_LONG
-            ).show()
+        } catch (exception: Exception) {
+            handleCameraError(exception)
         }
     }
 
@@ -245,6 +251,40 @@ class DashboardFragment : Fragment() {
                 }
             }
         )
+    }
+
+    private fun restartCamera() {
+        if (!isAdded || _binding == null) return
+        binding.previewView.post { startCamera() }
+    }
+
+    private fun handleCameraError(exception: Exception) {
+        Log.e(TAG, "Camera error", exception)
+        if (!isAdded) return
+        when (exception) {
+            is CameraUnavailableException -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.message_camera_unavailable),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            is IllegalStateException -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.message_camera_unavailable),
+                    Toast.LENGTH_LONG
+                ).show()
+                restartCamera()
+            }
+            else -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.message_camera_unavailable),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
